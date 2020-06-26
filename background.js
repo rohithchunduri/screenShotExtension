@@ -2,7 +2,41 @@
 // query param to the url that displays the screenshot.
 let id = 100;
 
+
 chrome.storage.local.set({"state" : "start"}, () => {});
+
+chrome.commands.getAll(function(commands){
+  console.log(commands)
+})
+
+function captureScreenShot(msg){
+  chrome.tabs.captureVisibleTab((screenshotUrl) => {
+    chrome.storage.local.get('screenShots', (result) => {
+      let currShots = result.screenShots;
+      let message = "";
+      if(msg.message != undefined){
+        message = msg.message;
+      }
+      currShots.push({"screenshotUrl": screenshotUrl, "message" : message});
+      chrome.storage.local.set({'screenShots' : currShots}, ()=>{});
+    })
+  });
+}
+
+chrome.commands.onCommand.addListener(function(command) {
+  
+  if(command == "start-taking-screenshot"){
+    alert("Enabled to Start Taking Screen Shots");
+    chrome.storage.local.set({"state" : "progress"}, () => {});
+    chrome.storage.local.set({'screenShots' : []}, ()=>{});
+  }
+
+  if(command == "capture-screen"){
+    var message = prompt("Enter Comments for the ScreenShot");
+    captureScreenShot({"message" : message});
+  }
+
+});
 
 chrome.runtime.onConnect.addListener(function(port) {
 
@@ -15,13 +49,7 @@ chrome.runtime.onConnect.addListener(function(port) {
     }
 
     if(msg.event == "takeScreenShot"){
-      chrome.tabs.captureVisibleTab((screenshotUrl) => {
-        chrome.storage.local.get('screenShots', (result) => {
-          let currShots = result.screenShots;
-          currShots.push({"screenshotUrl": screenshotUrl, "message" : msg.message});
-          chrome.storage.local.set({'screenShots' : currShots}, ()=>{});
-        })
-      });
+      captureScreenShot(msg);
     }
 
     if(msg.event == "stopScreenShot"){
