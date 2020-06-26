@@ -8,8 +8,11 @@ var changeState = (currState) => {
 
         $("#click").prop('disabled', true);
         $("#view").prop('disabled', true);
+        $("#undo").prop('disabled', true);
         $("#cancel").prop('disabled', true);
         $("#generatePDF").prop('disabled', true);
+        $("#comments").prop('disabled', true);
+        $("#fileName").prop('disabled', true);
     }
 
     if(currState == "progress"){
@@ -17,9 +20,11 @@ var changeState = (currState) => {
 
         $("#click").prop('disabled', false);
         $("#view").prop('disabled', false);
+        $("#undo").prop('disabled', false);
         $("#cancel").prop('disabled', false);
         $("#generatePDF").prop('disabled', false);
-        $("#start").prop('disabled', true);
+        $("#comments").prop('disabled', false);
+        $("#fileName").prop('disabled', false);
     }
 }
 
@@ -29,6 +34,7 @@ window.onload = function(){
     document.getElementById("click").addEventListener("click", takeScreenShot);
     document.getElementById("view").addEventListener("click", stopScreenShot);
     document.getElementById("cancel").addEventListener("click", cancelScreenShot);
+    document.getElementById("undo").addEventListener("click", undoScreenShot);
     document.getElementById("generatePDF").addEventListener("click", generatePDF);
 
     chrome.storage.local.get("state", (data) => {
@@ -77,9 +83,16 @@ function stopScreenShot(){
 
 function cancelScreenShot(){
     console.log("cancel screen shot");
-    port.postMessage({"event": "cancelScreenShot"});
-
     chrome.storage.local.set({"state": "start"}, () => {});
+}
+
+function undoScreenShot(){
+    console.log("Cleared recent screen shot");
+    chrome.storage.local.get('screenShots', result => {
+        var currShots = result.screenShots;
+        currShots.pop();
+        chrome.storage.local.set({'screenShots' : currShots}, ()=>{});
+    })
 }
 
 function generatePDF(){
