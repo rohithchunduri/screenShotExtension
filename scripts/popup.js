@@ -30,7 +30,6 @@ window.onload = function(){
     document.getElementById("view").addEventListener("click", stopScreenShot);
     document.getElementById("cancel").addEventListener("click", cancelScreenShot);
     document.getElementById("generatePDF").addEventListener("click", generatePDF);
-    //document.getElementById("comments").addEventListener('keypress', enterValue);
 
     chrome.storage.local.get("state", (data) => {
 
@@ -40,15 +39,6 @@ window.onload = function(){
         this.changeState(currState);
     })
 }
-
-/*
-function enterValue(event) {
-    if(event.key == 'Enter'){
-        console.log(event.target.value);
-    }
-}
-*/
-
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
     for(var key in changes){
@@ -94,7 +84,10 @@ function cancelScreenShot(){
 
 function generatePDF(){
 
+    var fileName = $('#fileName').val() + ".pdf";
+
     var doc = new jsPDF();
+    doc.setFontSize(10);
 
     var maxHeight = doc.internal.pageSize.height;
 
@@ -112,11 +105,12 @@ function generatePDF(){
             height = height + 10 + 80;
         });
 
-        doc.save('samplePDF.pdf');
+        doc.save(fileName);
 
         chrome.storage.local.set({'screenShots' : []}, ()=>{});
         chrome.storage.local.set({"state": "start"}, () => {});
 
+        $('#fileName').val("");
     })
 }
 

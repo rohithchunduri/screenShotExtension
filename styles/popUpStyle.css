@@ -16,3 +16,8 @@
 .form-control{
     font-size : 12px;
 }
+
+.input-group-text{
+    font-size: 10px;
+    width:40px;
+}
