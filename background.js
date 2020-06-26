@@ -18,7 +18,7 @@ chrome.runtime.onConnect.addListener(function(port) {
       chrome.tabs.captureVisibleTab((screenshotUrl) => {
         chrome.storage.local.get('screenShots', (result) => {
           let currShots = result.screenShots;
-          currShots.push(screenshotUrl);
+          currShots.push({"screenshotUrl": screenshotUrl, "message" : msg.message});
           chrome.storage.local.set({'screenShots' : currShots}, ()=>{});
         })
       });

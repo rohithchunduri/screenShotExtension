@@ -30,6 +30,7 @@ window.onload = function(){
     document.getElementById("view").addEventListener("click", stopScreenShot);
     document.getElementById("cancel").addEventListener("click", cancelScreenShot);
     document.getElementById("generatePDF").addEventListener("click", generatePDF);
+    //document.getElementById("comments").addEventListener('keypress', enterValue);
 
     chrome.storage.local.get("state", (data) => {
 
@@ -39,6 +40,15 @@ window.onload = function(){
         this.changeState(currState);
     })
 }
+
+/*
+function enterValue(event) {
+    if(event.key == 'Enter'){
+        console.log(event.target.value);
+    }
+}
+*/
+
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
     for(var key in changes){
@@ -65,7 +75,9 @@ function startScreenShot(){
 
 function takeScreenShot(){
     console.log("click screen shot");
-    port.postMessage({"event" : "takeScreenShot"});
+    let currMessage = $('#comments').val();
+    port.postMessage({"event" : "takeScreenShot", "message" : currMessage});
+    $('#comments').val('');
 }
 
 function stopScreenShot(){
@@ -95,7 +107,8 @@ function generatePDF(){
                 doc.addPage();
                 height = 10;
             }
-            doc.addImage(screenShot, 'JPEG', 10 , height, 180, 80);
+            doc.text(screenShot.message, 10, height - 4);
+            doc.addImage(screenShot.screenshotUrl, 'JPEG', 10 , height, 180, 80);
             height = height + 10 + 80;
         });
 
